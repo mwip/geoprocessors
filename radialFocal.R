@@ -35,17 +35,24 @@ opt <- parse_args(opt_parser)
 # Funtion body
 suppressMessages(library(raster))
 
+# check if input and output files are given
 if (is.na(opt$input) | is.na(opt$output)){
   print_help(opt_parser)
   stop("Please specify input AND output files\n", call.=FALSE)
 }
+
+# load input image
 r <- raster(opt$input)
 
+# create circular focal weight matrix
 w <- focalWeight(r, d = opt$radius, type = 'circle')
 w[w > 0] <- 1
 
+# apply focal matrix ver image
+focal(r, w, fun = opt$fun, pad = TRUE, pad.value = NA, na.rm = TRUE, 
+      filename = out$output, overwrite = opt$overwrite, 
+      options = c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED"))
 
-out <- focal(r, w, fun = opt$fun, pad = TRUE, pad.value = NA, na.rm = TRUE)
+# remove created temporary files
+removeTmpFiles(0)
 
-writeRaster(out, filename = opt$output, overwrite = opt$overwrite, 
-            options = c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED"))
