@@ -19,4 +19,11 @@ export PATH=$PATH:/the/path/to/geoprocessors
 - R-Packages
     + raster
     + optparse
+    + igraph
+
+---
+## Contributions
+
+The authors acknowledge all the work and effort by the contrigutors to the various R and python libraries. Withouth their work, this collection of geoprocessors would never be possible. 
+
 

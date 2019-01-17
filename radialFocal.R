@@ -50,7 +50,7 @@ w[w > 0] <- 1
 
 # apply focal matrix ver image
 focal(r, w, fun = opt$fun, pad = TRUE, pad.value = NA, na.rm = TRUE, 
-      filename = out$output, overwrite = opt$overwrite, 
+      filename = opt$output, overwrite = opt$overwrite, 
       options = c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED"))
 
 # remove created temporary files
