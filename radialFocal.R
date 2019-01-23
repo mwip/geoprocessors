@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript --vanilla
+#! /usr/bin/Rscript --vanilla
 #    radielFocal - Calculate a radial focal filter for an image
 #    Copyright (C) 2019 Matthias Weigand -- matthias.weigand[at]protonmail.com
 #    This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 # Header for program flags
 library(optparse)
 option_list = list(
-  make_option(c('-i', '--inputfile'), type = 'character', default = NA, help = 'character. input data file'),
+  make_option(c('-i', '--input'), type = 'character', default = NA, help = 'character. input data file'),
   make_option(c('-o', '--output'), type = 'character', default = NA, help = 'character. output data file, must be GeoTIFF'),
   make_option(c('-r', '--radius'), type = 'numeric', default = 100, help = 'numeric. radius in map units (defined by inputfile crs), default 100'),
   make_option(c('-f', '--fun'), type = 'character', default = "mean", help = 'character. specify the function you want to use, refer to: R -e "?raster::focal"'), 
