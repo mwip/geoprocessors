@@ -1,53 +1,52 @@
 #! /usr/bin/python
 
 import sys
-
-# print('sys.argv is', sys.argv)
-
+import argparse
+ 
 def main():
-    script = sys.argv[0]
-    flags = sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        description = "QGIS Zonal Statistics wrapper")
 
-    ## possible variables as determined by variables
-    rasterIn = ""
-    rasterInBand = 1
-    vectorIn = ""
-    columnPrefix = "ZS_"
-    # statistics
-    statAll = false
-    statCount = false
-    statSum = false
-    statMean = false
-    statMedian = false
-    statStd = false
-    statMin = false
-    statMax = false
-    statRange = false
-    statMinority = false
-    statMajority = false
-    statVariety = false
-    statVariance = false
+    parser.add_argument('RasterLayer', action = 'store', 
+            help = "Raster layer in input.") 
 
+    parser.add_argument('-b', '--BandNumber', action = 'store', default = 1, 
+            type = int, 
+            help = "If the raster is multiband choose the band you want to calculate the statistics. Default: 1.")
+
+    parser.add_argument('VectorLayer', action = 'store', 
+            help = "Polygon Vector layer containing zones.")
+
+    parser.add_argument('-p', '--prefix', action = 'store', default = "_", 
+            help = "Prefix string for output columns. Default: '_'.")
+
+    parser.add_argument('-statCount', action = 'store_true', 
+            help = "Statistics to calculate")   
+    parser.add_argument('-statSum', action = 'store_true')   
+    parser.add_argument('-statMean', action = 'store_true')   
+    parser.add_argument('-statMedian', action = 'store_true')   
+    parser.add_argument('-statStd', action = 'store_true')   
+    parser.add_argument('-statMin', action = 'store_true')   
+    parser.add_argument('-statMax', action = 'store_true')   
+    parser.add_argument('-statRange', action = 'store_true')   
+    parser.add_argument('-statMinority', action = 'store_true')   
+    parser.add_argument('-statMajority', action = 'store_true')   
+    parser.add_argument('-statVariety', action = 'store_true')   
+    parser.add_argument('-statVariance', action = 'store_true')   
+    parser.add_argument('-statAll', action = 'store_true', 
+            help = "Calculate all the above")   
+
+
+
+    args = parser.parse_args()
+    print(args)
+
+    print(args.BandNumber)
 
     
-    
-    # assigning flags to variables
-    i = 0
-    while i < len(flags):
-        # help flag
-        if flags[i] == "-h": 
-            print("Usage:zonalStatistics.qgis [Options] inputRaster inputVector
-                    \t-h\tShow this help message
-                    \t-p --prefix\tOutput column prefix. Default to 'ZS_'.
-                    \t-statAll\tCalculate all of the below statistics")
-            break
-        if flags[i] == "-": 
-            
-            i += 2
-        if flags[i] == "-statAll": 
 
-
-main()
+if __name__ == '__main__':
+    main()
 
 
 
