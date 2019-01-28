@@ -2,8 +2,11 @@
 
 import sys
 import argparse
+from qgis.core import QgsApplication
  
 def main():
+
+    # handle cli flags
     parser = argparse.ArgumentParser(
         description = "QGIS Zonal Statistics wrapper")
 
@@ -37,16 +40,59 @@ def main():
             help = "Calculate all the above")   
 
 
-
+    # parse input arguments 
     args = parser.parse_args()
-    print(args)
-
-    print(args.BandNumber)
-
     
+    # prepare stats from input arguments
+    stats = []
+    
+    # if statAll is checked append all stats to list
+    if args.statAll: 
+        for i in range(12):
+            stats.append(i)
+    if args.statCount:
+        stats.append(0)
+    if args.statSum:
+        stats.append(1)
+    if args.statMean:
+        stats.append(2)
+    if args.statMedian:
+        stats.append(3)
+    if args.statStd:
+        stats.append(4)
+    if args.statMin:
+        stats.append(5)
+    if args.statMax:
+        stats.append(6)
+    if args.statRange:
+        stats.append(7)
+    if args.statMinority:
+        stats.append(8)
+    if args.statMajority:
+        stats.append(9)
+    if args.statVariety:
+        stats.append(10)
+    if args.statVariance:
+        stats.append(11)
+
+
+    # remove duplicates by converting to set and back to list
+    stats_final = list(set(stats))
+
+    # create parameters for qgis processing tool
+    params = {
+        'INPUT_RASTER': args.RasterLayer, 
+        'RASTER_BAND': args.BandNumber, 
+        'INPUT_VECTOR': args.VectorLayer, 
+        'COLUMN_PREFIX': args.prefix, 
+        'STATS': stats_final
+    }
+
+    print(params)
+    # the magic happens here
+    # res = processing.run('qgis:zonalstatistics', params)
+
 
 if __name__ == '__main__':
     main()
-
-
 
