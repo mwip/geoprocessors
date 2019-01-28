@@ -2,7 +2,9 @@
 
 import sys
 import argparse
-from qgis.core import QgsApplication
+import processing
+from processing.core.Processing import Processing
+Processing.initialize()
  
 def main():
 
