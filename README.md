@@ -20,6 +20,9 @@ export PATH=$PATH:/the/path/to/geoprocessors
     + raster
     + optparse
     + igraph
+- Python 3
+- QGIS
+    + python-qgis
 
 ---
 ## Contributions
