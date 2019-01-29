@@ -23,6 +23,7 @@ export PATH=$PATH:/the/path/to/geoprocessors
 - Python 3
 - QGIS
     + python-qgis
+    + python-gdal
 
 ---
 ## Contributions
