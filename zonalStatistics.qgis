@@ -2,12 +2,24 @@
 
 import sys
 import argparse
+
+# https://gis.stackexchange.com/a/279937
+from qgis.core import (
+     QgsApplication, 
+     QgsProcessingFeedback, 
+     QgsVectorLayer
+)
+from qgis.analysis import QgsNativeAlgorithms
+
+# Append the path where processing plugin can be found
+sys.path.append('/usr/share/qgis/python/plugins/')
+
 import processing
 from processing.core.Processing import Processing
-Processing.initialize()
  
-def main():
 
+def main():
+      
     # handle cli flags
     parser = argparse.ArgumentParser(
         description = "QGIS Zonal Statistics wrapper")
@@ -80,7 +92,14 @@ def main():
 
     # remove duplicates by converting to set and back to list
     stats_final = list(set(stats))
-
+    
+    # See https://gis.stackexchange.com/a/155852/4972 for details about the prefix 
+    QgsApplication.setPrefixPath('/usr', True)
+    qgs = QgsApplication([], False)
+    qgs.initQgis()
+    
+    Processing.initialize()
+    QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms()) 
     # create parameters for qgis processing tool
     params = {
         'INPUT_RASTER': args.RasterLayer, 
@@ -90,9 +109,9 @@ def main():
         'STATS': stats_final
     }
 
-    print(params)
+    # print(params)
     # the magic happens here
-    # res = processing.run('qgis:zonalstatistics', params)
+    res = processing.run('qgis:zonalstatistics', params)
 
 
 if __name__ == '__main__':
