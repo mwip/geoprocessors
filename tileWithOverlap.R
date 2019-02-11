@@ -1,5 +1,5 @@
 #!/usr/bin/Rscript --vanilla
-#    radialFocal - Calculate a radial focal filter for an image
+#    tileWithOverlap - Tile an image into overlapping tiles
 #    Copyright (C) 2019 Matthias Weigand -- matthias.weigand[at]protonmail.com
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
