@@ -20,6 +20,7 @@ export PATH=$PATH:/the/path/to/geoprocessors
     + raster
     + optparse
     + igraph
+    + TileManager
 - Python 3
 - QGIS
     + python-qgis
