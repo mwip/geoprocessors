@@ -22,7 +22,9 @@ export PATH=$PATH:/the/path/to/geoprocessors
 - GDAL
 - R
 - R-Packages
+    + sf
     + raster
+    + sp
     + optparse
     + igraph
     + [TileManager](https://github.com/AndyPL22/TileManager)
