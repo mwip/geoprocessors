@@ -5,6 +5,10 @@ A collection of R scripts (among others) for geographic processing wrapped in co
 geoprocessors is a collection of command line tools created from the languages **R** and **Python** and others. 
 Please refer to the requirements necessary for running all programs. 
 
+## Installation 
+
+Install this toolbox by installing all needed dependencies (see [here](https://github.com/mwip/geoprocessors#requirements)) and clone this repository. Ensure `chmod +x` each of the processors, if they are not marked as executable. 
+
 ## Export Path
 
 If you want to use the wrapper programs from all directories just by calling the function's name, you need to adjust the PATH variable. This is done by adding the directory you cloned this repository into to the environment.  
@@ -15,6 +19,7 @@ export PATH=$PATH:/the/path/to/geoprocessors
 
 
 ## Requirements
+- GDAL
 - R
 - R-Packages
     + raster
