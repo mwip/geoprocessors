@@ -31,7 +31,7 @@ option_list = list(
   make_option(c('-w', '--overwrite'), action = 'store_true', default = FALSE, type = 'logical', help = 'logical. Should the output file be overwritten if necessary?'),
   make_option(c('-m', '--multicore'), action = 'store_true', default = FALSE, type = 'logical', help = 'logical. Should the program run in parallel?')
 )
-opt_parser <- OptionParser(usage = "Usage: %prog -i input.tif -o output.tif -r 100 -f mean -overwrite", 
+opt_parser <- OptionParser(usage = "Usage: %prog -i test.tif -o tiles -c 1000 -b 20 -m -e -w", 
                            option_list=option_list)
 opt <- parse_args(opt_parser)
 #==============================================================================#
