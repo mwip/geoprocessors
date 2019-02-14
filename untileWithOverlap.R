@@ -40,6 +40,7 @@ suppressMessages(library(parallel))
 suppressMessages(library(gdalUtils))
 suppressMessages(library(sf))
 suppressMessages(library(stringi))
+suppressMessages(library(stringr))
 suppressMessages(library(dplyr))
 
 
@@ -51,7 +52,90 @@ if (is.na(opt$input) | is.na(opt$output) | is.na(opt$tileShapes)){
 
 # detect all input data by input pattern
 files <- list.files(path = opt$directory, pattern = opt$input, full.names = TRUE)
+cat(paste("Files to be tiled:", length(files), "\n"))
 
+## Correct datatypes ##
+# all files for consistent data types
+# necessary since vrt does not allow to have differing datatypes
+dtypes <- sapply(files, function(x){
+  dataType(raster(x))
+})
+
+# identify the highest order data types from all dtypes in files
+for (dt in dtypes){
+  
+  # check if target variable was already defined. Usually necessary in 1st iteration
+  if (!exists("highestdt")){
+    highestdt <- dt
+  } else {
+    
+    # if datatype differs from the current highest
+    if (dt != highestdt){
+      
+      # arrange the current and the highest in an order using factors. 
+      # thus comparison by order is possible 
+      ord <- ordered(c(dt, highestdt), 
+                     c("LOG1S", "INT1U", "INT1S", "INT2U", "INT2S", "INT4U", 
+                       "INT4S", "FLT4S", "FLT8S"))
+      
+      # check whether the current dt is of higher order than currently highest
+      if (ord[1] > ord[2]) {
+        highestdt <- dt
+      }
+    }
+  }
+}
+
+# identify tiles not having the highest order datatype 
+filesToCorrect <- files[dtypes != highestdt]
+
+# convert dataType to GDAL notation of datatypes
+gdalNotation <- function(d){
+  
+  if (d == "INT1U"){
+    return("Byte")
+  } 
+  if (d == "LOG1S"){
+    return("Byte")
+  } 
+  
+  type <- str_sub(d, 1, 3)
+  type <- ifelse(type == "INT", "Int", "Float")
+  bit <- as.numeric(str_sub(d, 4, 4)) * 8
+  sign <- str_sub(d, 5, 5)
+  
+  if (sign == "U"){
+    return(paste0(sign, type, bit))
+  } else {
+    return(paste0(type, bit))
+  }
+}
+
+# function to convert the data type to the highest dt
+translateToDt <- function(ras, hdt){
+  gdal_translate(ras, 
+                 paste0(dirname(ras), "/tmp_", basename(ras)), 
+                 ot = hdt, 
+                 co = c("COMPRESS=LZW", "BIGTIFF=YES"))
+  file.remove(ras)
+  file.rename(from = paste0(dirname(ras), "/tmp_", basename(ras)), 
+              to = ras)
+}
+
+# translate all files not having the highest datatype
+cat(paste("Must correct datatype of", length(filesToCorrect), "files\n"))
+
+if (!opt$multicore){
+  dump <- sapply(filesToCorrect, 
+                 function(x) translateToDt(x, gdalNotation(highestdt)))
+} else {
+  dump <- mclapply(filesToCorrect, 
+                   function(x) translateToDt(x, gdalNotation(highestdt)), 
+                   mc.cores = detectCores())
+}
+
+
+## Untile ##
 # read polygon shapes from database
 polygons <- st_read(opt$tileShapes, quiet = TRUE)
 
@@ -68,7 +152,8 @@ untile <- function(rasterFile){
   # build the vrt
   gdalbuildvrt(gdalfile = rasterFile, 
                output.vrt = gsub(".tif$", ".vrt", rasterFile), 
-               te = tileExtent)
+               te = tileExtent, 
+               resolution = "highest")
   
   # return the vrt file name in order to generate large vrt afterwards
   return(gsub(".tif$", ".vrt", rasterFile))
@@ -83,13 +168,14 @@ if (opt$multicore){
 
 # build one giant vrt from all vrt files
 invisible(gdalbuildvrt(gdalfile = tileVRTs, 
-                       output.vrt = "tmpout.vrt"))
+                       output.vrt = "tmpout.vrt",
+                       resolution = "highest"))
 
 # gdal create options with or without multicore 
 if (!opt$multicore){
-  cos <- c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED")
+  cos <- c("COMPRESS=LZW", "BIGTIFF=YES")
 } else {
-  cos <- c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED", "NUM_THREADS=ALL_CPUS")
+  cos <- c("COMPRESS=LZW", "BIGTIFF=YES", "NUM_THREADS=ALL_CPUS")
 }
 
 invisible(gdal_translate("tmpout.vrt", dst_dataset = opt$output, 
