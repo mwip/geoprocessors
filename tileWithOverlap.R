@@ -21,13 +21,13 @@ library(optparse)
 option_list = list(
   make_option(c('-i', '--input'), type = 'character', default = NA, help = 'character. input data file'),
   make_option(c('-o', '--output'), type = 'character', default = "tile", help = 'character. output data directory'),
-  make_option(c('-e', '--exportShapes'), action = 'store_true', type = 'logical',default = FALSE, help = 'character. Export tile index to output directory? See `?TileManager::TileScheme` for info on the three output shapes.'),
   make_option(c('-c', '--dimByCell'), type = 'numeric', default = NULL, help = 'Vector of two numbers. Defines the \'x\' and \'y\' dimensions in distance units of input.'),
   make_option(c('-d', '--dimByDist'), type = 'numeric', default = NULL, help = 'Vector of two numbers. Defines the \'x\' and \'y\' dimensions in number of cells.'),
   make_option(c('-b', '--buffer'), type = 'numeric', default = 0, help = 'numeric. Default 0. If set to >0, overlapping buffers will be created around each tile. Defined in cell number or distance unit, depending on the the usage of dim.by.cell or dim.by.dist respectively'),
   make_option(c('-s', '--bufferspill'), action = 'store_true', type = 'logical', default = FALSE, help = 'logical. Default FALSE, in which case the tiling grid will be pushed inwards so that the buffers of the outer tiles are within the extent of input. If set to TRUE, the buffers will extend outside of the extent of input'),
   make_option(c('-r', '--removeEmpty'), action = 'store_true', type = 'logical', default = FALSE, help = 'logical. Default is FALSE. If set to TRUE, tiles containing only NA cell values will be removed from the tiling scheme.'),
   make_option(c('-t', '--dataType'), default = "INT2U", type = 'character', help = 'character. Datatype for output tif (see `?raster::dataType` for more info). Default "INT2U"'),
+  make_option(c('-e', '--exportShapes'), action = 'store_true', type = 'logical',default = FALSE, help = 'logical. Export tile index to output directory? See `Rscript -e "?TileManager::TileScheme"` section \'Value\' for info on the three output shapes that will be genereated if -e is given.'),
   make_option(c('-w', '--overwrite'), action = 'store_true', default = FALSE, type = 'logical', help = 'logical. Should the output file be overwritten if necessary?'),
   make_option(c('-m', '--multicore'), action = 'store_true', default = FALSE, type = 'logical', help = 'logical. Should the program run in parallel?')
 )
