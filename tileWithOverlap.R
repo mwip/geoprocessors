@@ -21,8 +21,8 @@ library(optparse)
 option_list = list(
   make_option(c('-i', '--input'), type = 'character', default = NA, help = 'character. input data file'),
   make_option(c('-o', '--output'), type = 'character', default = "tile", help = 'character. output data directory'),
-  make_option(c('-c', '--dimByCell'), type = 'numeric', default = NULL, help = 'Vector of two numbers. Defines the \'x\' and \'y\' dimensions in distance units of input.'),
-  make_option(c('-d', '--dimByDist'), type = 'numeric', default = NULL, help = 'Vector of two numbers. Defines the \'x\' and \'y\' dimensions in number of cells.'),
+  make_option(c('-c', '--dimByCell'), type = 'character', default = NULL, help = 'Character. String of one or two numbers (e.g. "2500,2500", or "130"). Defines the \'x\' and \'y\' dimensions in number of cells.'),
+  make_option(c('-d', '--dimByDist'), type = 'character', default = NULL, help = 'Character. String of one or two numbers (e.g. "2500,2500", or "130"). Defines the \'x\' and \'y\' dimensions in distance units of input (Check geographic reference system for units).'),
   make_option(c('-b', '--buffer'), type = 'numeric', default = 0, help = 'numeric. Default 0. If set to >0, overlapping buffers will be created around each tile. Defined in cell number or distance unit, depending on the the usage of dim.by.cell or dim.by.dist respectively'),
   make_option(c('-s', '--bufferspill'), action = 'store_true', type = 'logical', default = FALSE, help = 'logical. Default FALSE, in which case the tiling grid will be pushed inwards so that the buffers of the outer tiles are within the extent of input. If set to TRUE, the buffers will extend outside of the extent of input'),
   make_option(c('-r', '--removeEmpty'), action = 'store_true', type = 'logical', default = FALSE, help = 'logical. Default is FALSE. If set to TRUE, tiles containing only NA cell values will be removed from the tiling scheme.'),
@@ -50,6 +50,16 @@ if (is.na(opt$input) | is.na(opt$output)){
   stop("Please specify input AND output files\n", call. = FALSE)
 }
 
+# create function handling character input of dimensions -d or -c
+handleChrStrings <- function(x){
+  if (is.null(x)){
+    return(NULL)
+  }
+  
+  as.numeric(unlist(strsplit(x, ",")))
+  
+}
+
 # create output directory
 dir.create(opt$output, showWarnings = FALSE)
 
@@ -57,7 +67,8 @@ dir.create(opt$output, showWarnings = FALSE)
 r <- raster(opt$input)
 
 # apply the tiling scheme
-ts <- TileScheme(r, dimByCell = opt$dimByCell, dimByDist = opt$dimByDist,
+ts <- TileScheme(r, dimByCell = handleChrStrings(opt$dimByCell), 
+                 dimByDist = handleChrStrings(opt$dimByDist),
                  buffer = opt$buffer, bufferspill = opt$bufferspill,
                  removeEmpty = opt$removeEmpty)
 
