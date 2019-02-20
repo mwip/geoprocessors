@@ -79,7 +79,8 @@ tileRasters <- function(x){
   t <- ts[[2]][x, ]
 
   # create output file name
-  ofn <- paste0(opt$output, "/", gsub(".tif$", paste0("_", t$tileName, ".tif"), opt$input))
+  ofn <- paste0(opt$output, "/", gsub(".tif$", paste0("_", t$tileName, ".tif"), 
+                                      basename(opt$input)))
 
   # do the magic
   crop(r, t,
