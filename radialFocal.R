@@ -45,7 +45,7 @@ if (is.na(opt$input) | is.na(opt$output)){
 r <- raster(opt$input)
 
 # check if radius is valid (i.e. greater than raster resolution)
-if (which.min(c(res(r), opt$radius) == 3) {
+if (which.min(c(res(r), opt$radius) == 3)) {
   stop("Radius is less than raster resolution. Is radius provided in map units?\n", call.=FALSE)
 }
 
