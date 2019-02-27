@@ -44,6 +44,11 @@ if (is.na(opt$input) | is.na(opt$output)){
 # load input image
 r <- raster(opt$input)
 
+# check if radius is valid (i.e. greater than raster resolution)
+if (opt$radius < res(r)) {
+  stop("Radius is less than raster resolution. Is radius provided in map units?\n", call.=FALSE)
+}
+
 # create circular focal weight matrix
 w <- focalWeight(r, d = opt$radius, type = 'circle')
 w[w > 0] <- 1
