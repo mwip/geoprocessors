@@ -64,7 +64,7 @@ handleChrStrings <- function(x){
 dir.create(opt$output, showWarnings = FALSE)
 
 # read raster
-r <- raster(opt$input)
+r <- stack(opt$input)
 
 # apply the tiling scheme
 ts <- TileScheme(r, dimByCell = handleChrStrings(opt$dimByCell), 
