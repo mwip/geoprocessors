@@ -141,5 +141,6 @@ if (opt$multicore) {
 #             buffer = 10,
 #             bufferspill = FALSE,
 #             removeEmpty = FALSE,
-#             dataType = "UInt16", 
-#             aoi = "aoi.sqlite")
+#             dataType = "UInt16",
+#             aoi = "aoi.sqlite",
+#             processors = 7)
