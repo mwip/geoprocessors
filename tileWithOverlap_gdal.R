@@ -44,7 +44,9 @@ opt <- parse_args(opt_parser)
 suppressMessages(library(TileManager))
 suppressMessages(library(raster))
 suppressMessages(library(parallel))
-suppressMessages(library(sf))
+# suppressMessages(library(sf))
+suppressMessages(library(rgdal))
+suppressMessages(library(rgeos))
 
 # check if input and output files are given
 if (is.na(opt$input) | is.na(opt$output)){
@@ -76,8 +78,8 @@ ts <- TileScheme(r, dimByCell = handleChrStrings(opt$dimByCell),
 
 if (!is.null(opt$aoi)){
   cat("Using aoi to select tiles\n")
-  aoi <- st_read(opt$aoi, quiet = TRUE) %>% st_transform(as.character(crs(r)))
-  tilesToExport <- which(st_as_sf(ts[[2]]) %>% st_intersects(aoi) %>% lengths() > 0)
+  aoi <- spTransform(readOGR(opt$aoi, verbose = FALSE), as.character(crs(r)))
+  tilesToExport <- which(gIntersects(ts[[2]], aoi, byid = TRUE))
 } else {
   tilesToExport <- 1:length(ts[[2]])
 }
@@ -87,7 +89,7 @@ tileRasters <- function(x){
 
   # select tile
   t <- ts[[2]][x, ]
-  bbx <- st_bbox(t)
+  bbx <- c(t@bbox)
 
   # create output file name
   ofn <- paste0(opt$output, "/", gsub(".tif$|.vrt$", paste0("_", t$tileName, ".tif"), 
@@ -111,13 +113,13 @@ if (opt$exportShapes){
   suppressWarnings(file.remove(paste0(opt$output, "/tilePolygons.sqlite"), 
                                paste0(opt$output, "/buffPolygons.sqlite"), 
                                paste0(opt$output, "/nBuffPolygons.sqlite")))
-  sf::st_write(sf::st_as_sf(ts[[1]][tilesToExport,]), quiet = TRUE, 
+  writeOGR(ts[[1]][tilesToExport,], verbose = FALSE, 
                dsn = paste0(opt$output, "/tilePolygons.sqlite"), layer = "tiles",
                driver = "SQLite", dataset_options = c("SPATIALITE=YES"))
-  sf::st_write(sf::st_as_sf(ts[[2]][tilesToExport,]), quiet = TRUE,
+  writeOGR(ts[[2]][tilesToExport,], verbose = FALSE,
                dsn = paste0(opt$output, "/buffPolygons.sqlite"), layer = "tiles",
                driver = "SQLite", dataset_options = c("SPATIALITE=YES"))
-  sf::st_write(sf::st_as_sf(ts[[3]][tilesToExport,]), quiet = TRUE,
+  writeOGR(ts[[3]][tilesToExport,], verbose = FALSE,
                dsn = paste0(opt$output, "/nBuffPolygons.sqlite"), layer = "tiles",
                driver = "SQLite", dataset_options = c("SPATIALITE=YES"))
 }
@@ -141,6 +143,5 @@ if (opt$multicore) {
 #             buffer = 10,
 #             bufferspill = FALSE,
 #             removeEmpty = FALSE,
-#             dataType = "UInt16",
-#             aoi = "aoi.sqlite",
-#             processors = 7)
+#             dataType = "UInt16", 
+#             aoi = "aoi.sqlite")
