@@ -1,6 +1,6 @@
 #! /usr/bin/Rscript --vanilla
 #    radialFocal - Calculate a radial focal filter for an image
-#    Copyright (C) 2019 Matthias Weigand -- matthias.weigand[at]protonmail.com
+#    Copyright (C) 2020 Matthias Weigand -- matthias.weigand[at]protonmail.com
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +18,7 @@
 #==============================================================================#
 # Header for program flags
 library(optparse)
-option_list = list(
+option_list <- list(
   make_option(c('-i', '--input'), type = 'character', default = NA, help = 'character. input data file'),
   make_option(c('-o', '--output'), type = 'character', default = NA, help = 'character. output data file, must be GeoTIFF'),
   make_option(c('-r', '--radius'), type = 'numeric', default = 100, help = 'numeric. radius in map units (defined by inputfile crs), default 100'),
@@ -36,28 +36,28 @@ opt <- parse_args(opt_parser)
 suppressMessages(library(raster))
 
 # check if input and output files are given
-if (is.na(opt$input) | is.na(opt$output)){
+if (is.na(opt$input) | is.na(opt$output)) {
   print_help(opt_parser)
-  stop("Please specify input AND output files\n", call.=FALSE)
+  stop("Please specify input AND output files\n", call. = FALSE)
 }
 
 # load input image
 r <- raster(opt$input)
 
-# check if radius is valid (i.e. greater than raster resolution)
-#if (which.min(c(res(r), opt$radius) == 3)) {
-#  stop("Radius is less than raster resolution. Is radius provided in map units?\n", call.=FALSE)
-#}
-
 # create circular focal weight matrix
 w <- focalWeight(r, d = opt$radius, type = 'circle')
-w[w > 0] <- 1
+w <- ifelse(w > 0, 1, NA)
+
+the_fun <- get(opt$fun)
 
 # apply focal matrix ver image
-focal(r, w, fun = opt$fun, pad = TRUE, pad.value = NA, na.rm = TRUE, 
-      filename = opt$output, overwrite = opt$overwrite, 
+focal(r, w,
+      fun = function(x, na.rm, ... = the_fun) {
+        ...(x, na.rm = TRUE)
+      },
+      pad = TRUE, pad.value = NA, na.rm = TRUE,
+      filename = opt$output, overwrite = opt$overwrite,
       options = c("COMPRESS=LZW", "BIGTIFF=IF_NEEDED"))
 
 # remove created temporary files
 removeTmpFiles(0)
-
