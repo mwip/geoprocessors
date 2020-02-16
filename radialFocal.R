@@ -53,7 +53,10 @@ the_fun <- get(opt$fun)
 # apply focal matrix ver image
 focal(r, w,
       fun = function(x, na.rm, ... = the_fun) {
-        ...(x, na.rm = TRUE)
+        if (na.rm) {
+          x <- na.omit(x)
+        }
+        ...(x)
       },
       pad = TRUE, pad.value = NA, na.rm = TRUE,
       filename = opt$output, overwrite = opt$overwrite,
