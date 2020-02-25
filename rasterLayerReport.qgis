@@ -1,0 +1,76 @@
+#! /usr/bin/python3
+
+#     rasterLayerReport.qgis - report raster unique raster values from the cli
+#     Copyright (C) 2020 Matthias Weigand
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+    
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+    
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <https://www.gnu.org/licenses/>
+
+import sys
+import argparse
+
+from qgis.core import (
+     QgsApplication, 
+     QgsProcessingFeedback, 
+     QgsVectorLayer
+)
+from qgis.analysis import QgsNativeAlgorithms
+
+# Append the path where processing plugin can be found
+sys.path.append('/usr/share/qgis/python/plugins/')
+
+import processing
+from processing.core.Processing import Processing
+ 
+
+def main():
+    # handle cli flags
+    parser = argparse.ArgumentParser(
+        description = "QGIS Raster Layer Unique Values Report wrapper")
+
+    parser.add_argument('RasterLayer', action = 'store', 
+            help = "Raster layer in input.") 
+
+    parser.add_argument('-b', '--BandNumber', action = 'store',
+            default = 1, type = int, 
+            help = "If the raster is multiband choose the band you want to calculate the statistics. Default: 1.")
+
+    parser.add_argument('-o', '--OutputHtmlFile', action = 'store',
+            help = 'By default the HTML will be saved to a temporary file. Specify HTML here if needed.')
+
+    parser.add_argument('-t', '--OutputTable', action = 'store',
+            help = 'Skipped by default, specify a file if table should be stored to GPKG.')
+
+    # parse input arguments 
+    args = parser.parse_args()
+
+    
+    QgsApplication.setPrefixPath('/usr', True)
+    qgs = QgsApplication([], False)
+    qgs.initQgis()
+    
+    Processing.initialize()
+    QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms()) 
+    # create parameters for qgis processing tool
+    params = {
+        'INPUT': args.RasterLayer, 
+        'BAND': args.BandNumber, 
+        'OUTPUT_HTML_FILE': args.OutputHtmlFile,
+        'OUTPUT_TABLE': args.OutputTable
+    }
+
+    # the magic happens here
+    res = processing.run('native:rasterlayeruniquevaluesreport', params)
+    # print(res)
+
+if __name__ == '__main__':
+    main()
